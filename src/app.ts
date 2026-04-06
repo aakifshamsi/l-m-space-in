@@ -10,6 +10,7 @@ import { formsAutomationRoutes } from './routes/forms-automation';
 import { formsAdminRoutes } from './routes/forms-admin';
 import { cmsAdminRoutes } from './routes/cms-admin';
 import { blogPublicRoutes } from './routes/blog-public';
+import { masterRoutes } from './routes/master';
 import { createMagicLinkService } from './services/magic-link';
 import { createAuthService } from './services/auth';
 
@@ -84,6 +85,14 @@ app.get('/auth/magic-link/verify', async (c) => {
   c.header('Set-Cookie', `session=${sessionToken}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${7 * 24 * 60 * 60}`);
 
   return c.redirect('/admin/dashboard');
+});
+
+// Master site routes — intercepts all paths for m-space.in requests
+app.all('*', async (c, next) => {
+  if (c.get('siteType') !== 'master') {
+    return next();
+  }
+  return masterRoutes.fetch(c.req.raw, c.env);
 });
 
 // Admin routes - MUST be defined BEFORE public routes to prevent /:slug from catching /admin

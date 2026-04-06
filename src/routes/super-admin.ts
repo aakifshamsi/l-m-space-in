@@ -6,6 +6,7 @@ import type { Env } from '../config';
 import { createDbHelper } from '../db';
 import { requireAuth, getCurrentUser } from '../middleware/auth';
 import { checkOllamaStatus } from '../services/ai';
+import { renderSuperAdminDashboard } from '../views/master/super-admin';
 
 export const superAdminRoutes = new Hono<{ Bindings: Env }>();
 
@@ -24,45 +25,44 @@ superAdminRoutes.use('*', async (c, next) => {
 // Dashboard & Status
 // ==========================================
 
-// System overview
+// System overview — HTML dashboard using real DB data
 superAdminRoutes.get('/dashboard', async (c) => {
   const db = createDbHelper(c.env.DB);
   const hostname = c.req.header('host') || '';
-  
-  // Only allow access from master panel domain
+
   if (!hostname.includes('m-space.in') && !hostname.includes('localhost')) {
     return c.json({ error: 'Access denied from this domain' }, 403);
   }
-  
-  // Get system stats
-  const [linkCount] = await db.all<{ count: number }>('SELECT COUNT(*) as count FROM links');
-  const [userCount] = await db.all<{ count: number }>('SELECT COUNT(*) as count FROM users');
-  const [clickCount] = await db.all<{ count: number }>('SELECT COUNT(*) as count FROM clicks');
-  const [activeLinks] = await db.all<{ count: number }>("SELECT COUNT(*) as count FROM links WHERE is_active = 1");
-  
-  // Get recent activity
-  const recentActivity = await db.all(
-    'SELECT * FROM activity_log ORDER BY created_at DESC LIMIT 10'
-  );
-  
-  return c.json({
-    success: true,
-    system: {
-      status: 'operational',
-      sites: [
-        { name: 'l.m-space.in', status: 'active', type: 'main' },
-        { name: 'edgy.frii.site', status: 'pending_dns', type: 'edgy' },
-        { name: 'm-space.in', status: 'active', type: 'master' },
-      ],
+
+  const currentUser = await getCurrentUser(c);
+
+  const [linkCount, userCount, clickCount, activeLinks] = await Promise.all([
+    db.get<{ count: number }>('SELECT COUNT(*) as count FROM links'),
+    db.get<{ count: number }>('SELECT COUNT(*) as count FROM users'),
+    db.get<{ count: number }>('SELECT COUNT(*) as count FROM clicks'),
+    db.get<{ count: number }>('SELECT COUNT(*) as count FROM links WHERE is_active = 1'),
+  ]);
+
+  const sites = await db.all<{
+    id: number; name: string; subdomain: string; domain: string;
+    status: string; plan: string; max_links: number; enable_ads: number;
+  }>('SELECT id, name, subdomain, domain, status, plan, max_links, enable_ads FROM sites ORDER BY id');
+
+  const activity = await db.all<{
+    action: string; details: string | null; created_at: string;
+  }>('SELECT action, details, created_at FROM activity_log ORDER BY created_at DESC LIMIT 10');
+
+  return c.html(renderSuperAdminDashboard(
+    {
+      totalLinks: linkCount?.count ?? 0,
+      activeLinks: activeLinks?.count ?? 0,
+      totalUsers: userCount?.count ?? 0,
+      totalClicks: clickCount?.count ?? 0,
     },
-    stats: {
-      totalLinks: linkCount?.count || 0,
-      activeLinks: activeLinks?.count || 0,
-      totalUsers: userCount?.count || 0,
-      totalClicks: clickCount?.count || 0,
-    },
-    recentActivity,
-  });
+    sites,
+    activity,
+    { email: currentUser!.email, role: currentUser!.role }
+  ));
 });
 
 // ==========================================

@@ -17,14 +17,9 @@ export function createAuthService(env: Env['DB']) {
 
     if (!user) return null;
 
-    // In production, use proper password verification
-    // For demo, we'll use simple comparison (should use bcrypt in production)
     const passwordHash = await hashPassword(password);
-    if (user.password_hash !== passwordHash && user.password_hash !== password) {
-      // For demo purposes, also accept the plain password for testing
-      if (user.password_hash !== `demo_${password}`) {
-        return null;
-      }
+    if (user.password_hash !== passwordHash) {
+      return null;
     }
 
     return user;
