@@ -1,0 +1,27 @@
+name = "l-m-space-in"
+compatibility_date = "2024-12-01"
+main = "src/index.ts"
+account_id = "ac642222567fc094f80de10293ba6ef9"
+
+# Multi-site route configuration
+# l.m-space.in - Main link shortener
+# m-space.in - Master control panel
+# edgy.frii.site - Edgy/fun variant (requires frii.site zone to be added to Cloudflare)
+routes = [
+  { pattern = "https://l.m-space.in/*", zone_name = "m-space.in" },
+  { pattern = "https://m-space.in/*", zone_name = "m-space.in" },
+]
+
+[vars]
+SITE_URL = "https://l.m-space.in"
+MASTER_PANEL_URL = "https://m-space.in"
+EDGY_SITE_URL = "https://edgy.frii.site"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "l-m-space-in"
+database_id = "314bb374-df3a-43f6-b3a0-3410969191b2"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "c3d8bf393b2b47bdb0dbe96e63e9cfdf"
