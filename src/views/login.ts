@@ -162,11 +162,6 @@ export function renderLoginPage({ redirect = '/admin/dashboard', error, branding
           </form>
         </div>
 
-        <div class="mt-6 text-center text-sm text-gray-500">
-          <p>Default credentials (change on first login):</p>
-          <p class="mt-1">Owner: hammad@example.com / owner123</p>
-          <p>Admin: aakif@sham.si / admin123</p>
-        </div>
       </div>
     </div>
 
