@@ -28,7 +28,8 @@ cmsAdminRoutes.use('/*', requireAuth);
 // CMS MAIN DASHBOARD
 // ===============================================
 
-cmsAdminRoutes.get('/cms', async (c) => {
+// CMS Dashboard (mounted at /admin/cms)
+cmsAdminRoutes.get('/', async (c) => {
   const db = createDbHelper(c.env.DB);
   const autoBlogService = new AutoBlogService(c.env.DB as D1Database);
   
@@ -60,7 +61,7 @@ cmsAdminRoutes.get('/cms', async (c) => {
 // ===============================================
 
 // List all pages
-cmsAdminRoutes.get('/cms/pages', async (c) => {
+cmsAdminRoutes.get('/pages', async (c) => {
   const db = createDbHelper(c.env.DB);
   const status = c.req.query('status');
   
@@ -80,12 +81,12 @@ cmsAdminRoutes.get('/cms/pages', async (c) => {
 });
 
 // Create new page
-cmsAdminRoutes.get('/cms/pages/new', async (c) => {
+cmsAdminRoutes.get('/pages/new', async (c) => {
   return c.html(pageEditor(null));
 });
 
 // Edit page
-cmsAdminRoutes.get('/cms/pages/:id/edit', async (c) => {
+cmsAdminRoutes.get('/pages/:id/edit', async (c) => {
   const db = createDbHelper(c.env.DB);
   const id = parseInt(c.req.param('id'));
   
@@ -102,7 +103,7 @@ cmsAdminRoutes.get('/cms/pages/:id/edit', async (c) => {
 });
 
 // Save page (create or update)
-cmsAdminRoutes.post('/cms/pages/save', async (c) => {
+cmsAdminRoutes.post('/pages/save', async (c) => {
   const db = createDbHelper(c.env.DB);
   const body = await c.req.parseBody();
   const userId = c.get('userId') as number;
@@ -138,7 +139,7 @@ cmsAdminRoutes.post('/cms/pages/save', async (c) => {
 });
 
 // Delete page
-cmsAdminRoutes.post('/cms/pages/:id/delete', async (c) => {
+cmsAdminRoutes.post('/pages/:id/delete', async (c) => {
   const db = createDbHelper(c.env.DB);
   const id = parseInt(c.req.param('id'));
   
@@ -148,7 +149,7 @@ cmsAdminRoutes.post('/cms/pages/:id/delete', async (c) => {
 });
 
 // Publish/Unpublish page
-cmsAdminRoutes.post('/cms/pages/:id/toggle-status', async (c) => {
+cmsAdminRoutes.post('/pages/:id/toggle-status', async (c) => {
   const db = createDbHelper(c.env.DB);
   const id = parseInt(c.req.param('id'));
   
@@ -173,7 +174,7 @@ cmsAdminRoutes.post('/cms/pages/:id/toggle-status', async (c) => {
 // ===============================================
 
 // Auto Blog Dashboard
-cmsAdminRoutes.get('/cms/blog/auto', async (c) => {
+cmsAdminRoutes.get('/blog/auto', async (c) => {
   const db = createDbHelper(c.env.DB);
   const autoBlogService = new AutoBlogService(c.env.DB as D1Database);
   
@@ -195,7 +196,7 @@ cmsAdminRoutes.get('/cms/blog/auto', async (c) => {
 });
 
 // Generate new blog post
-cmsAdminRoutes.post('/cms/blog/auto/generate', async (c) => {
+cmsAdminRoutes.post('/blog/auto/generate', async (c) => {
   const db = createDbHelper(c.env.DB);
   const autoBlogService = new AutoBlogService(c.env.DB as D1Database);
   const settings = await db.all<{ key: string; value: string }>('SELECT * FROM settings', []);
@@ -223,7 +224,7 @@ cmsAdminRoutes.post('/cms/blog/auto/generate', async (c) => {
 });
 
 // Generate post from specific topic
-cmsAdminRoutes.post('/cms/blog/auto/generate/:topicId', async (c) => {
+cmsAdminRoutes.post('/blog/auto/generate/:topicId', async (c) => {
   const db = createDbHelper(c.env.DB);
   const autoBlogService = new AutoBlogService(c.env.DB as D1Database);
   const topicId = parseInt(c.req.param('topicId'));
@@ -253,7 +254,7 @@ cmsAdminRoutes.post('/cms/blog/auto/generate/:topicId', async (c) => {
 });
 
 // Edit auto-generated post
-cmsAdminRoutes.get('/cms/blog/auto/:id/edit', async (c) => {
+cmsAdminRoutes.get('/blog/auto/:id/edit', async (c) => {
   const autoBlogService = new AutoBlogService(c.env.DB as D1Database);
   const id = parseInt(c.req.param('id'));
 
@@ -266,7 +267,7 @@ cmsAdminRoutes.get('/cms/blog/auto/:id/edit', async (c) => {
 });
 
 // Save edited post
-cmsAdminRoutes.post('/cms/blog/auto/save', async (c) => {
+cmsAdminRoutes.post('/blog/auto/save', async (c) => {
   const autoBlogService = new AutoBlogService(c.env.DB as D1Database);
   const body = await c.req.parseBody();
 
@@ -282,7 +283,7 @@ cmsAdminRoutes.post('/cms/blog/auto/save', async (c) => {
 });
 
 // Publish post
-cmsAdminRoutes.post('/cms/blog/auto/:id/publish', async (c) => {
+cmsAdminRoutes.post('/blog/auto/:id/publish', async (c) => {
   const autoBlogService = new AutoBlogService(c.env.DB as D1Database);
   const id = parseInt(c.req.param('id'));
 
@@ -291,7 +292,7 @@ cmsAdminRoutes.post('/cms/blog/auto/:id/publish', async (c) => {
 });
 
 // Unpublish post
-cmsAdminRoutes.post('/cms/blog/auto/:id/unpublish', async (c) => {
+cmsAdminRoutes.post('/blog/auto/:id/unpublish', async (c) => {
   const autoBlogService = new AutoBlogService(c.env.DB as D1Database);
   const id = parseInt(c.req.param('id'));
 
@@ -300,7 +301,7 @@ cmsAdminRoutes.post('/cms/blog/auto/:id/unpublish', async (c) => {
 });
 
 // Delete post
-cmsAdminRoutes.post('/cms/blog/auto/:id/delete', async (c) => {
+cmsAdminRoutes.post('/blog/auto/:id/delete', async (c) => {
   const autoBlogService = new AutoBlogService(c.env.DB as D1Database);
   const id = parseInt(c.req.param('id'));
 
@@ -309,7 +310,7 @@ cmsAdminRoutes.post('/cms/blog/auto/:id/delete', async (c) => {
 });
 
 // Regenerate post
-cmsAdminRoutes.post('/cms/blog/auto/:id/regenerate', async (c) => {
+cmsAdminRoutes.post('/blog/auto/:id/regenerate', async (c) => {
   const db = createDbHelper(c.env.DB);
   const autoBlogService = new AutoBlogService(c.env.DB as D1Database);
   const id = parseInt(c.req.param('id'));
@@ -331,7 +332,7 @@ cmsAdminRoutes.post('/cms/blog/auto/:id/regenerate', async (c) => {
 // ===============================================
 
 // Topics manager
-cmsAdminRoutes.get('/cms/blog/topics', async (c) => {
+cmsAdminRoutes.get('/blog/topics', async (c) => {
   const autoBlogService = new AutoBlogService(c.env.DB as D1Database);
   const topics = await autoBlogService.getActiveTopics();
 
@@ -339,7 +340,7 @@ cmsAdminRoutes.get('/cms/blog/topics', async (c) => {
 });
 
 // Add topic
-cmsAdminRoutes.post('/cms/blog/topics/add', async (c) => {
+cmsAdminRoutes.post('/blog/topics/add', async (c) => {
   const autoBlogService = new AutoBlogService(c.env.DB as D1Database);
   const body = await c.req.parseBody();
 
@@ -357,7 +358,7 @@ cmsAdminRoutes.post('/cms/blog/topics/add', async (c) => {
 });
 
 // Toggle topic active status
-cmsAdminRoutes.post('/cms/blog/topics/:id/toggle', async (c) => {
+cmsAdminRoutes.post('/blog/topics/:id/toggle', async (c) => {
   const autoBlogService = new AutoBlogService(c.env.DB as D1Database);
   const id = parseInt(c.req.param('id'));
 
@@ -374,7 +375,7 @@ cmsAdminRoutes.post('/cms/blog/topics/:id/toggle', async (c) => {
 });
 
 // Delete topic
-cmsAdminRoutes.post('/cms/blog/topics/:id/delete', async (c) => {
+cmsAdminRoutes.post('/blog/topics/:id/delete', async (c) => {
   const autoBlogService = new AutoBlogService(c.env.DB as D1Database);
   const id = parseInt(c.req.param('id'));
 
@@ -387,7 +388,7 @@ cmsAdminRoutes.post('/cms/blog/topics/:id/delete', async (c) => {
 // CMS SETTINGS
 // ===============================================
 
-cmsAdminRoutes.get('/cms/settings', async (c) => {
+cmsAdminRoutes.get('/settings', async (c) => {
   const db = createDbHelper(c.env.DB);
   const settings = await db.all<{ key: string; value: string }>('SELECT * FROM settings', []);
   const settingsMap = Object.fromEntries(settings.map((r: { key: string; value: string }) => [r.key, r.value]));
@@ -396,7 +397,7 @@ cmsAdminRoutes.get('/cms/settings', async (c) => {
 });
 
 // Update CMS settings
-cmsAdminRoutes.post('/cms/settings', async (c) => {
+cmsAdminRoutes.post('/settings', async (c) => {
   const db = createDbHelper(c.env.DB);
   const body = await c.req.parseBody();
 
@@ -418,7 +419,7 @@ cmsAdminRoutes.post('/cms/settings', async (c) => {
 // SETUP TRIGGER (for scheduled posts)
 // ===============================================
 
-cmsAdminRoutes.post('/cms/blog/process-scheduled', async (c) => {
+cmsAdminRoutes.post('/blog/process-scheduled', async (c) => {
   const autoBlogService = new AutoBlogService(c.env.DB as D1Database);
 
   const count = await autoBlogService.processScheduledPosts();

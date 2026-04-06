@@ -89,8 +89,14 @@ app.get('/auth/magic-link/verify', async (c) => {
 // Admin routes - MUST be defined BEFORE public routes to prevent /:slug from catching /admin
 app.route('/admin', adminRoutes);
 
+// Explicit /admin/ route (trailing slash) - redirects to /admin
+app.get('/admin/', (c) => c.redirect('/admin', 302));
+
 // Super Admin routes - Master control panel at /admin/super
 app.route('/admin/super', superAdminRoutes);
+
+// Public Blog routes - Blog listing and single post pages (MUST be before /:slug catch-all)
+app.route('/', blogPublicRoutes);
 
 // Public routes - redirect and public pages (includes /:slug which catches everything else)
 app.route('/', publicRoutes);
@@ -107,6 +113,3 @@ app.route('/admin/forms-automation', formsAdminRoutes);
 
 // CMS Admin routes - Full CMS Backend (Pages, Blog, Auto-Blog, Settings)
 app.route('/admin/cms', cmsAdminRoutes);
-
-// Public Blog routes - Blog listing and single post pages
-app.route('/', blogPublicRoutes);

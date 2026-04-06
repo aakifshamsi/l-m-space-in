@@ -174,6 +174,43 @@ blogPublicRoutes.get('/blog', async (c) => {
   `);
 });
 
+// RSS Feed (MUST be before /:slug to prevent matching "rss.xml" as a slug)
+blogPublicRoutes.get('/blog/rss.xml', async (c) => {
+  const db = c.env.DB as D1Database;
+  const autoBlogService = new AutoBlogService(db);
+  
+  const { posts } = await autoBlogService.getPublishedPosts({ pageSize: 20 });
+  const siteName = 'M-Space';
+  
+  const blogUrl = 'https://m-space.in/blog';
+
+  const rssItems = posts.map(post => `
+    <item>
+      <title><![CDATA[${post.title}]]></title>
+      <link>${blogUrl}/${post.slug}</link>
+      <guid isPermaLink="true">${blogUrl}/${post.slug}</guid>
+      <description><![CDATA[${post.excerpt || post.content.substring(0, 200)}]]></description>
+      <pubDate>${new Date(post.published_at || post.created_at).toUTCString()}</pubDate>
+      <category>${post.category}</category>
+    </item>
+  `).join('');
+
+  return c.html(`<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>${siteName} Blog</title>
+    <link>${blogUrl}</link>
+    <description>News, tips, and insights about link management and digital productivity.</description>
+    <language>en-us</language>
+    <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
+    <atom:link href="${blogUrl}/rss.xml" rel="self" type="application/rss+xml"/>
+    ${rssItems}
+  </channel>
+</rss>`, 200, {
+    'Content-Type': 'application/xml; charset=utf-8'
+  });
+});
+
 // Single blog post page
 blogPublicRoutes.get('/blog/:slug', async (c) => {
   const db = c.env.DB as D1Database;
@@ -351,43 +388,6 @@ blogPublicRoutes.get('/blog/:slug', async (c) => {
 </body>
 </html>
   `);
-});
-
-// RSS Feed
-blogPublicRoutes.get('/blog/rss.xml', async (c) => {
-  const db = c.env.DB as D1Database;
-  const autoBlogService = new AutoBlogService(db);
-  
-  const { posts } = await autoBlogService.getPublishedPosts({ pageSize: 20 });
-  const siteName = 'M-Space';
-  
-  const blogUrl = 'https://m-space.in/blog';
-
-  const rssItems = posts.map(post => `
-    <item>
-      <title><![CDATA[${post.title}]]></title>
-      <link>${blogUrl}/${post.slug}</link>
-      <guid isPermaLink="true">${blogUrl}/${post.slug}</guid>
-      <description><![CDATA[${post.excerpt || post.content.substring(0, 200)}]]></description>
-      <pubDate>${new Date(post.published_at || post.created_at).toUTCString()}</pubDate>
-      <category>${post.category}</category>
-    </item>
-  `).join('');
-
-  return c.html(`<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>${siteName} Blog</title>
-    <link>${blogUrl}</link>
-    <description>News, tips, and insights about link management and digital productivity.</description>
-    <language>en-us</language>
-    <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
-    <atom:link href="${blogUrl}/rss.xml" rel="self" type="application/rss+xml"/>
-    ${rssItems}
-  </channel>
-</rss>`, 200, {
-    'Content-Type': 'application/xml; charset=utf-8'
-  });
 });
 
 export default blogPublicRoutes;
