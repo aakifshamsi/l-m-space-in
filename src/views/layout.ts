@@ -29,6 +29,8 @@ export function renderLayout({ title = 'Muslim Space Link', user, children, acti
     { href: '/admin/dashboard', label: 'Dashboard', active: activeNav === 'dashboard' },
     { href: '/admin/links', label: 'Links', active: activeNav === 'links' },
     { href: '/admin/tags', label: 'Tags', active: activeNav === 'tags' },
+    { href: '/admin/cms/pages', label: 'Pages', active: activeNav === 'pages' },
+    { href: '/admin/cms/events', label: 'Events', active: activeNav === 'events' },
     { href: '/admin/settings', label: 'Settings', active: activeNav === 'settings' },
   ];
 
