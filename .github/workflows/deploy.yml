@@ -15,12 +15,8 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: l-m-space-in/package-lock.json
-      - name: Install dependencies
-        working-directory: ./l-m-space-in
-        run: npm ci
+      - run: npm ci
       - name: Type check
-        working-directory: ./l-m-space-in
         # Allow failure until Sprint 3 clears pre-existing TS errors
         run: npm run typecheck || true
 
@@ -31,22 +27,14 @@ jobs:
     permissions:
       contents: read
       deployments: write
-
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: l-m-space-in/package-lock.json
-
-      - name: Install dependencies
-        working-directory: ./l-m-space-in
-        run: npm ci
-
+      - run: npm ci
       - name: Deploy Worker
-        working-directory: ./l-m-space-in
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -59,19 +47,14 @@ jobs:
     permissions:
       contents: read
       deployments: write
-
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: l-m-space-in/package-lock.json
-      - name: Install dependencies
-        working-directory: ./l-m-space-in
-        run: npm ci
+      - run: npm ci
       - name: Deploy preview
-        working-directory: ./l-m-space-in
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
