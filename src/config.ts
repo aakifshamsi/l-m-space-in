@@ -140,7 +140,8 @@ export function detectSiteType(hostname: string | undefined): SiteType {
   
   const lowerHost = hostname.toLowerCase();
   
-  if (lowerHost === 'm-space.in' || lowerHost.endsWith('.m-space.in')) {
+  // Only the apex domain (and www) is master — subdomains like l.m-space.in are their own sites
+  if (lowerHost === 'm-space.in' || lowerHost === 'www.m-space.in') {
     return 'master';
   }
   
